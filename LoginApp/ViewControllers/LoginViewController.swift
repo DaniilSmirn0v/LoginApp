@@ -11,10 +11,9 @@ class LoginViewController: UIViewController {
 
     @IBOutlet weak var userNameTF: UITextField!
     @IBOutlet weak var passwordTF: UITextField!
-    
-    private let userName = "User"
-    private let password = "Password"
-    
+
+    let userInfo = User.getInfo()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         userNameTF.delegate = self
@@ -22,12 +21,22 @@ class LoginViewController: UIViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let welcomeVC = segue.destination as? WelcomeViewController else {return}
-        welcomeVC.userName = userName
+        guard let tabBarController = segue.destination as? UITabBarController else {return}
+        for viewController in tabBarController.viewControllers! {
+            if let welcomeVC = viewController as? WelcomeViewController {
+                welcomeVC.userName = userInfo.person.fullname
+            }
+
+            if let navigationVC = viewController as? UINavigationController {
+                let infoUserVC = navigationVC.topViewController as? InfoViewController
+                infoUserVC?.info = userInfo.person
+            }
+        }
+
     }
 
     @IBAction func loginAction() {
-        if userNameTF.text != userName, passwordTF.text != password {
+        if userNameTF.text != userInfo.userName || passwordTF.text != userInfo.password {
             showAlert(title: "Incorrect data entry", message: "Enter correct Login or Password", textField: passwordTF)
             return
         }
